@@ -12,7 +12,7 @@ const SignUpForm = () => {
 
     try {
       const response = await fetch(
-        `https://code-master-learning-ahst.vercel.app/api/auth/register`,
+        `https://backend-master-ten.vercel.app/api/auth/register`,
         {
           method: "POST",
           headers: {
