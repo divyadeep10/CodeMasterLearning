@@ -6,7 +6,7 @@ const LoginForm = () => {
 
   const onLoginSubmit = async (data) => {
     try {
-      const response = await fetch(`https://backend-master-ten.vercel.app/api/auth/login`, {
+      const response = await fetch(`https://backend-master-cyan.vercel.app/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
