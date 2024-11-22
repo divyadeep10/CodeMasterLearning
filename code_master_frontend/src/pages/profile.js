@@ -9,7 +9,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/auth/profile', {
+        const response = await fetch('https://backend-master-cyan.vercel.app/api/auth/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -35,7 +35,7 @@ const Profile = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:4000/api/auth/profile', {
+      const response = await fetch('https://backend-master-cyan.vercel.app/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
