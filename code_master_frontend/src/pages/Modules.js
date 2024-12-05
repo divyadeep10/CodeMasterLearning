@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { questions } from './questions'; 
+import { questions } from './questions';
 
 const languageConfig = {
     python: { id: 71, name: 'Python' },
@@ -9,83 +9,90 @@ const languageConfig = {
     c: { id: 50, name: 'C' },
     javascript: { id: 63, name: 'JavaScript' },
     java: { id: 62, name: 'Java' },
-    ruby: { id: 72, name: 'Ruby' }
+    ruby: { id: 72, name: 'Ruby' },
 };
 
 const Modules = () => {
     const { language } = useParams();
     const [code, setCode] = useState('');
     const [output, setOutput] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [completedQuestions, setCompletedQuestions] = useState({});
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
-    const [completedQuestions, setCompletedQuestions] = useState([]);
-    const [showSolution, setShowSolution] = useState(false);
-
     const selectedLanguage = languageConfig[language];
-    const currentQuestions = questions[language] || []; // Fallback to an empty array if not found
+    const currentQuestions = questions[language] || [];
 
-    if (!selectedLanguage) {
-        return <div className="text-white">Language not supported.</div>;
-    }
+    useEffect(() => {
+        const fetchProgress = async () => {
+            try {
+                const userID = localStorage.getItem('userId');
+                if (!userID) return;
 
-    const runCode = async () => {
-        const runOptions = {
-            method: 'POST',
-            url: 'https://judge0-ce.p.rapidapi.com/submissions',
-            headers: {
-                'x-rapidapi-key': 'bb88d28783mshf80e424e0f5ac7cp18a09ajsn34145ed7c630', 
-                'x-rapidapi-host': 'judge0-ce.p.rapidapi.com',
-                'Content-Type': 'application/json',
-            },
-            data: {
-                source_code: code,
-                language_id: selectedLanguage.id,
-                stdin: '',
-                expected_output: '',
-            },
+                const updatedCompletedQuestions = [];
+                for (let index = 0; index < currentQuestions.length; index++) {
+                    const { data } = await axios.get(
+                        `https://backend-master-cyan.vercel.app/api/progress/ch/checker/${userID}/${language}/${index}`
+                    );
+                    if (data.completed) {
+                        updatedCompletedQuestions.push(index);
+                    }
+                }
+
+                setCompletedQuestions((prev) => ({
+                    ...prev,
+                    [language]: updatedCompletedQuestions,
+                }));
+            } catch (error) {
+                console.error('Error fetching progress:', error.message);
+            }
         };
 
-        setIsLoading(true);
-        setShowSolution(false); // Reset showSolution on code run
-        
+        fetchProgress();
+    }, [language, currentQuestions]);
+
+    const runCode = async () => {
+        if (!selectedLanguage) return;
+
         try {
-            const submitResponse = await axios.request(runOptions);
-            const { token } = submitResponse.data;
-
-            const checkOptions = {
-                method: 'GET',
-                url: `https://judge0-ce.p.rapidapi.com/submissions/${token}`,
-                headers: {
-                    'x-rapidapi-key': 'bb88d28783mshf80e424e0f5ac7cp18a09ajsn34145ed7c630',
-                    'x-rapidapi-host': 'judge0-ce.p.rapidapi.com',
+            const { data: { token } } = await axios.post(
+                'https://judge0-ce.p.rapidapi.com/submissions',
+                {
+                    source_code: code,
+                    language_id: selectedLanguage.id,
                 },
-            };
-
-            await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait for a moment before checking the result
-
-            const resultResponse = await axios.request(checkOptions);
-            const { stdout, stderr, compile_output } = resultResponse.data;
-
-            if (compile_output) {
-                setOutput('Compilation Error: ' + compile_output);
-            } else if (stderr) {
-                setOutput('Runtime Error: ' + stderr);
-            } else {
-                setOutput(stdout);
-                // Check if the output matches the expected output and mark as complete
-                if (currentQuestions[selectedQuestionIndex] &&
-                    stdout.trim() === currentQuestions[selectedQuestionIndex].expectedOutput.trim()) {
-                    setCompletedQuestions([...completedQuestions, selectedQuestionIndex]);
+                {
+                    headers: {
+                        'x-rapidapi-key': 'bb88d28783mshf80e424e0f5ac7cp18a09ajsn34145ed7c630',
+                        'Content-Type': 'application/json',
+                    },
                 }
-                setShowSolution(true); // Show solution button after code execution
+            );
+
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+
+            const { data: result } = await axios.get(
+                `https://judge0-ce.p.rapidapi.com/submissions/${token}`,
+                {
+                    headers: { 'x-rapidapi-key': 'bb88d28783mshf80e424e0f5ac7cp18a09ajsn34145ed7c630' },
+                }
+            );
+
+            const { stdout } = result;
+            setOutput(stdout || 'No output');
+
+            if (
+                stdout?.trim() === currentQuestions[selectedQuestionIndex]?.expectedOutput.trim()
+            ) {
+                setCompletedQuestions((prev) => ({
+                    ...prev,
+                    [language]: [...new Set([...(prev[language] || []), selectedQuestionIndex])],
+                }));
+
+                const userID = localStorage.getItem('userId');
+                updateProgress(userID, selectedQuestionIndex);
             }
-        } catch (error) {
-            console.error('Error running code:', error);
-            setError('Error running code.');
-            setOutput('');
-        } finally {
-            setIsLoading(false);
+        } catch (err) {
+            console.error('Error running code:', err);
+            setOutput('Failed to execute code.');
         }
     };
 
@@ -93,99 +100,80 @@ const Modules = () => {
         setSelectedQuestionIndex(index);
         setCode('');
         setOutput('');
-        setError('');
-        setShowSolution(false); // Reset when a new question is selected
     };
 
-    const isQuestionCompleted = (index) => {
-        return completedQuestions.includes(index);
+    const updateProgress = async (userID, questionIndex) => {
+        try {
+            const response = await axios.post('https://backend-master-cyan.vercel.app/api/progress/update', {
+                userID,
+                questionIndex,
+                language, // Include language in the update payload
+            });
+            console.log('Progress updated successfully:', response.data);
+        } catch (error) {
+            console.error('Error updating progress:', error.response?.data || error.message);
+        }
     };
+
+    if (!selectedLanguage) return <div>Language not supported.</div>;
 
     return (
-        <div className="min-h-screen p-8 bg-gray-900 text-white">
-            <h1 className="text-4xl font-bold mb-6 text-center">{selectedLanguage.name} Code Runner</h1>
+        <div className="p-6 bg-gray-900 text-white">
+            <h1 className="text-2xl font-bold mb-4">{selectedLanguage.name} Code Runner</h1>
 
-            {/* Displaying Questions in a Scrollable Selector */}
-            <div className="mb-8">
-                <h2 className="text-2xl font-bold mb-4">Questions:</h2>
-                <div className="overflow-y-auto h-48 bg-gray-800 border border-gray-700 rounded-lg p-4">
-                    {currentQuestions.length > 0 ? (
-                        currentQuestions.map((item, index) => (
-                            <div
-                                key={index}
-                                className={`p-2 mb-2 rounded cursor-pointer transition duration-200 
-                                    ${selectedQuestionIndex === index ? 'bg-blue-700' : 'hover:bg-gray-700'} 
-                                    ${isQuestionCompleted(index) ? 'bg-green-700' : ''}`}
-                                onClick={() => handleQuestionSelect(index)}
-                            >
-                                <span>{item.question}</span>
-                                {isQuestionCompleted(index) && (
-                                    <span className="ml-2 text-green-300 font-bold">✔</span>
-                                )}
-                            </div>
-                        ))
-                    ) : (
-                        <p>No questions available for this language.</p>
-                    )}
+            <div className="mb-4">
+                <h2 className="text-lg font-bold">Questions:</h2>
+                <div className="bg-gray-800 p-4 rounded">
+                    {currentQuestions.map((q, index) => (
+                        <div
+                            key={index}
+                            className={`p-2 rounded mb-2 cursor-pointer ${
+                                (completedQuestions[language] || []).includes(index)
+                                    ? 'bg-green-700'
+                                    : 'hover:bg-gray-700'
+                            }`}
+                            onClick={() => handleQuestionSelect(index)}
+                        >
+                            {q.question} {(completedQuestions[language] || []).includes(index) && '✔'}
+                        </div>
+                    ))}
                 </div>
             </div>
 
-            {/* Display Selected Question */}
             {selectedQuestionIndex !== null && (
-                <div className="mb-8 p-4 bg-gray-800 border border-gray-700 rounded-lg">
-                    <h3 className="font-semibold">Selected Question:</h3>
-                    <p>{currentQuestions[selectedQuestionIndex].question}</p>
-                    <p className="text-sm text-gray-400">Expected Output: {currentQuestions[selectedQuestionIndex].expectedOutput}</p>
+                <div className="mb-4">
+                    <h3>Question:</h3>
+                    <p>{currentQuestions[selectedQuestionIndex]?.question}</p>
                 </div>
             )}
 
-            {/* Code Editor */}
             <textarea
-                className="w-full p-2 rounded border border-gray-700 bg-gray-800 text-white mb-4"
+                className="w-full p-2 rounded mb-4 bg-gray-800 text-white"
                 rows={10}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder={`Write your ${selectedLanguage.name} code here...`}
             />
 
-            <div className="flex space-x-2 mb-4">
-                <button
-                    className="bg-blue-600 text-white px-4 py-2 rounded transition duration-200 hover:bg-blue-700"
-                    onClick={runCode}
-                    disabled={isLoading}
-                >
-                    {isLoading ? 'Running...' : 'Run Code'}
-                </button>
+            <button
+                className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+                onClick={runCode}
+            >
+                Run Code
+            </button>
 
-                <button
-                    className={`bg-green-600 text-white px-4 py-2 rounded transition duration-200 
-                        ${showSolution ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
-                    onClick={() => setShowSolution(true)} // Only show solution when button is clicked
-                    disabled={!showSolution}
-                >
-                    View Solution
-                </button>
-            </div>
-
-            <div className="bg-gray-800 text-white p-4 rounded mt-4">
-                <h2 className="font-bold">Output:</h2>
+            <div className="mt-4 bg-gray-800 p-4 rounded">
+                <h3>Output:</h3>
                 <pre>{output}</pre>
             </div>
 
-            {error && (
-                <div className="bg-red-600 text-white p-4 rounded mt-4">
-                    <h2 className="font-bold">Error:</h2>
-                    <pre>{error}</pre>
-                </div>
-            )}
-
-            {/* Display Solution */}
-            {showSolution && selectedQuestionIndex !== null && (
-                <div className="bg-yellow-600 p-4 rounded mt-4">
-                    <h2 className="font-bold">Solution:</h2>
-                    <pre>{currentQuestions[selectedQuestionIndex].solution}</pre>
-                </div>
-            )}
+            {selectedQuestionIndex !== null &&
+                (completedQuestions[language] || []).includes(selectedQuestionIndex) && (
+                    <div className="mt-4 bg-yellow-600 p-4 rounded">
+                        <h3>Solution:</h3>
+                        <pre>{currentQuestions[selectedQuestionIndex]?.solution}</pre>
+                    </div>
+                )}
         </div>
     );
 };

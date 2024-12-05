@@ -8,9 +8,9 @@ import Navbar from './components/navBar';
 import Modules from './pages/Modules';
 import NotFound from './pages/NotFound'; // A fallback page for 404
 import Profile from './pages/profile';
+import ProgressDB from './pages/progressDB';
 
 function App() {
-    // Check if the user is authenticated by looking for the token in localStorage
     const isAuthenticated = localStorage.getItem('token');
 
     return (
@@ -21,7 +21,6 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 
-                {/* Protect the dashboard route, user must be authenticated */}
                 <Route 
                     path="/dashboard" 
                     element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
@@ -31,10 +30,14 @@ function App() {
                     path="/profile" 
                     element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} 
                 />
+
+                <Route 
+                    path="/progressDB" 
+                    element={isAuthenticated ? <ProgressDB /> : <Navigate to="/login" />} 
+                />
                 
                 <Route path="/modules/:language" element={<Modules />} />
                 
-                {/* Fallback route for unmatched paths */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>
