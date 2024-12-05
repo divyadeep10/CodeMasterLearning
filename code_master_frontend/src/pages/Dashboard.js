@@ -15,7 +15,7 @@ function Dashboard() {
     const handleGoToFeature = (title) => {
         const pathMap = {
             profile: '/profile',
-            'Progress Tracker': '/progress',
+            'Progress Tracker': '/progressDB',
             'Coding Challenges': '/challenges',
             Leaderboard: '/leaderboard',
             Settings: '/settings',
