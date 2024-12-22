@@ -9,6 +9,8 @@ import Modules from './pages/Modules';
 import NotFound from './pages/NotFound'; // A fallback page for 404
 import Profile from './pages/profile';
 import ProgressDB from './pages/progressDB';
+import Challenges from './pages/challenges';
+import Leaderboard from './pages/leaderboard';
 
 function App() {
     const isAuthenticated = localStorage.getItem('token');
@@ -34,6 +36,16 @@ function App() {
                 <Route 
                     path="/progressDB" 
                     element={isAuthenticated ? <ProgressDB /> : <Navigate to="/login" />} 
+                />
+
+                <Route
+                    path="/challenges"
+                    element={isAuthenticated ? <Challenges /> : <Navigate to="/login" />}
+                />
+
+                <Route
+                    path="/leaderboard"
+                    element={isAuthenticated ? <Leaderboard /> : <Navigate to="/login" />}
                 />
                 
                 <Route path="/modules/:language" element={<Modules />} />

@@ -5,20 +5,18 @@ function Dashboard() {
     const navigate = useNavigate(); // Initialize the navigate function
 
     const features = [
-        { title: 'profile', description: 'View and edit your profile information.' },
+        { title: 'Settings', description: 'View and edit your profile information.' },
         { title: 'Progress Tracker', description: 'Track your progress and completed challenges.' },
         { title: 'Coding Challenges', description: 'Attempt coding problems to improve your skills.' },
         { title: 'Leaderboard', description: 'Check your rank among other users.' },
-        { title: 'Settings', description: 'Update your preferences and account settings.' },
     ];
 
     const handleGoToFeature = (title) => {
         const pathMap = {
-            profile: '/profile',
+            Settings: '/profile',
             'Progress Tracker': '/progressDB',
             'Coding Challenges': '/challenges',
             Leaderboard: '/leaderboard',
-            Settings: '/settings',
         };
     
         if (pathMap[title]) {
