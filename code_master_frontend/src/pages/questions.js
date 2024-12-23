@@ -104,5 +104,81 @@ export const questions = {
             solution: "#include <iostream>\nusing namespace std;\nint main() {\n    int arr[] = {3, 5, 7, 9, 1};\n    int maxNum = arr[0];\n    for (int i = 1; i < 5; i++) {\n        if (arr[i] > maxNum)\n            maxNum = arr[i];\n    }\n    cout << maxNum;\n    return 0;\n}"
         },
         // Add more questions up to 30 as needed
-    ]
+    ],
+    c: [
+            {
+                question: "Question 1: Write a program that prints 'Hello World'.",
+                expectedOutput: "Hello World",
+                solution: "#include<stdio.h>\nint main() {\n    printf(\"Hello World\\n\");\n    return 0;\n}"
+            },
+            {
+                question: "Question 2: Add two numbers.",
+                expectedOutput: "5",
+                solution: "#include<stdio.h>\nint main() {\n    int a = 2, b = 3;\n    printf(\"%d\\n\", a + b);\n    return 0;\n}"
+            },
+            {
+                question: "Question 3: Find the square of a number.",
+                expectedOutput: "16",
+                solution: "#include<stdio.h>\nint main() {\n    int num = 4;\n    printf(\"%d\\n\", num * num);\n    return 0;\n}"
+            },
+            // Add up to Question 30
+    ],
+
+    javascript: [
+        {
+            question: "Question 1: Write a program that prints 'Hello World'.",
+            expectedOutput: "Hello World",
+            solution: "console.log('Hello World');"
+        },
+        {
+            question: "Question 2: Add two numbers.",
+            expectedOutput: "5",
+            solution: "const a = 2;\nconst b = 3;\nconsole.log(a + b);"
+        },
+        {
+            question: "Question 3: Find the square of a number.",
+            expectedOutput: "16",
+            solution: "const num = 4;\nconsole.log(num ** 2);"
+        },
+        // Add up to Question 30
+    ],
+
+    java: [
+        {
+            question: "Question 1: Write a program that prints 'Hello World'.",
+            expectedOutput: "Hello World",
+            solution: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World\");\n    }\n}"
+        },
+        {
+            question: "Question 2: Add two numbers.",
+            expectedOutput: "5",
+            solution: "public class Main {\n    public static void main(String[] args) {\n        int a = 2, b = 3;\n        System.out.println(a + b);\n    }\n}"
+        },
+        {
+            question: "Question 3: Find the square of a number.",
+            expectedOutput: "16",
+            solution: "public class Main {\n    public static void main(String[] args) {\n        int num = 4;\n        System.out.println(num * num);\n    }\n}"
+        },
+        // Add up to Question 30
+    ],
+
+    ruby: [
+        {
+            question: "Question 1: Write a program that prints 'Hello World'.",
+            expectedOutput: "Hello World",
+            solution: "puts 'Hello World'"
+        },
+        {
+            question: "Question 2: Add two numbers.",
+            expectedOutput: "5",
+            solution: "a = 2\nb = 3\nputs a + b"
+        },
+        {
+            question: "Question 3: Find the square of a number. ruby",
+            expectedOutput: "16",
+            solution: "num = 4\nputs num ** 2"
+        },
+        // Add up to Question 30
+    ],
+
 };

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Home() {
     const navigate = useNavigate();
-    const [hovered, setHovered] = useState(false);
+    // const [hovered, setHovered] = useState(false);
 
     const languages = [
         { name: 'Python', path: '/modules/python', description: 'Master Python fundamentals and solve beginner to advanced coding challenges.' },
@@ -61,31 +61,58 @@ function Home() {
                 </div>
             </section>
 
-            {/* Features Coming Soon Section */}
-            <section
-                className="flex flex-col items-center py-16 bg-gray-800 relative overflow-hidden"
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-            >
-                <h2 className="text-4xl font-bold mb-4 animate-fade-in text-indigo-400">More Features Coming Soon!</h2>
-                <p className="text-lg text-center text-gray-300 max-w-lg animate-slide-up">
-                    Stay tuned for more exciting updates and interactive modules to enhance your coding journey!
-                </p>
+            {/* Features Section */}  
+            <section className="py-16 bg-gray-800 relative flex flex-col items-center text-gray-300">  
+                <h2 className="text-4xl font-bold mb-8 text-indigo-400 animate-fade-in">Explore the Features</h2>  
+                <p className="text-lg text-center max-w-2xl mb-12 animate-slide-up">  
+                    Dive into exciting tools and interactive modules designed to elevate your coding skills. Ready to explore? Log in now!  
+                </p>  
 
-                {/* Animated Backgrounds */}
-                <div
-                    className={`absolute w-72 h-72 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur-3xl opacity-30 transform transition-all duration-1000 ${
-                        hovered ? 'scale-150' : 'scale-100'
-                    }`}
-                    style={{ top: '20%', left: '10%' }}
-                ></div>
-                <div
-                    className={`absolute w-96 h-96 bg-gradient-to-r from-green-400 via-blue-400 to-indigo-500 rounded-full blur-3xl opacity-20 transform transition-all duration-1000 ${
-                        hovered ? 'scale-125' : 'scale-100'
-                    }`}
-                    style={{ bottom: '10%', right: '10%' }}
-                ></div>
-            </section>
+                {/* Feature Grid */}  
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-6xl px-4">  
+                    {/* Progress Tracker */}  
+                    <div className="bg-gray-700 p-6 rounded-lg shadow-lg hover:shadow-indigo-500 transition-shadow duration-300">  
+                        <h3 className="text-xl font-semibold text-indigo-300 mb-4">Progress Tracker</h3>  
+                        <p>Review all the questions you've solved and track your coding journey over time!</p>  
+                    </div>  
+
+                    {/* Settings */}  
+                    <div className="bg-gray-700 p-6 rounded-lg shadow-lg hover:shadow-purple-500 transition-shadow duration-300">  
+                        <h3 className="text-xl font-semibold text-purple-300 mb-4">Settings</h3>  
+                        <p>Easily edit your name, username, email, and manage your preferences.</p>  
+                    </div>  
+
+                    {/* Leaderboard */}  
+                    <div className="bg-gray-700 p-6 rounded-lg shadow-lg hover:shadow-blue-500 transition-shadow duration-300">  
+                        <h3 className="text-xl font-semibold text-blue-300 mb-4">Leaderboard</h3>  
+                        <p>See the top 10 solvers and challenge yourself to climb the ranks!</p>  
+                    </div>  
+
+                    {/* Coding Challenges */}  
+                    <div className="bg-gray-700 p-6 rounded-lg shadow-lg hover:shadow-green-500 transition-shadow duration-300">  
+                        <h3 className="text-xl font-semibold text-green-300 mb-4">Coding Challenges</h3>  
+                        <p>Test your skills with timed challenges. Solve as many questions as possible in 1 minute per question and earn points!</p>  
+                    </div>  
+                </div>  
+
+                <p className="text-lg mt-12 text-center animate-slide-up">
+                    Ready to get started?{" "}
+                    <a 
+                        href="/Dashboard" 
+                        className="text-indigo-300 font-semibold cursor-pointer hover:underline"
+                    >
+                        Log in now
+                    </a>{" "}
+                    to explore! Not registered?{" "}
+                    <a 
+                        href="/register" 
+                        className="text-purple-300 font-semibold cursor-pointer hover:underline"
+                    >
+                        Register now
+                    </a>.
+                </p>  
+
+            </section> 
 
             {/* Testimonials Section */}
             <section className="py-16 bg-gray-800">
