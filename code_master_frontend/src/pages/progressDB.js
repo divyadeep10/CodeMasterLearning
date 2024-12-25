@@ -16,7 +16,7 @@ const ProgressDB = () => {
       try {
         const response = await axios.get(`https://backend-master-cyan.vercel.app/api/progress/getprogress/${userId}`);
         setProgress(response.data);
-        console.log(response.data);
+        // console.log(response.data);
       } catch (error) {
         console.error('Error fetching progress:', error);
       }

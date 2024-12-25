@@ -18,7 +18,7 @@ const LoginForm = () => {
 
       if (response.ok) {
         alert("Login Successful!");
-        console.log("Token:", result.token);
+        // console.log("Token:", result.token);
         
         // Save token and user data to localStorage
         localStorage.setItem("token", result.token);

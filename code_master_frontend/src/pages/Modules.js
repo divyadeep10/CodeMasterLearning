@@ -18,11 +18,13 @@ const Modules = () => {
     const [output, setOutput] = useState('');
     const [completedQuestions, setCompletedQuestions] = useState({});
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
+    const [loading, setLoading] = useState(true);
     const selectedLanguage = languageConfig[language];
     const currentQuestions = questions[language] || [];
 
     useEffect(() => {
         const fetchProgress = async () => {
+            setLoading(true);
             try {
                 const userID = localStorage.getItem('userId');
                 if (!userID) return;
@@ -43,6 +45,8 @@ const Modules = () => {
                 }));
             } catch (error) {
                 console.error('Error fetching progress:', error.message);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -107,9 +111,9 @@ const Modules = () => {
             const response = await axios.post('https://backend-master-cyan.vercel.app/api/progress/update', {
                 userID,
                 questionIndex,
-                language, // Include language in the update payload
+                language,
             });
-            console.log('Progress updated successfully:', response.data);
+            // console.log('Progress updated successfully:', response.data);
         } catch (error) {
             console.error('Error updating progress:', error.response?.data || error.message);
         }
@@ -117,13 +121,17 @@ const Modules = () => {
 
     if (!selectedLanguage) return <div>Language not supported.</div>;
 
-    return (
+    return ( 
+
+        // i want here loading text that will become invisible after ticks are loaded 
+
         <div className="p-6 bg-gray-900 text-white">
             <h1 className="text-2xl font-bold mb-4">{selectedLanguage.name} Code Runner</h1>
-
+            
+            
             <div className="mb-4">
                 <h2 className="text-lg font-bold">Questions:</h2>
-                <div className="bg-gray-800 p-4 rounded">
+                <div className="bg-gray-800 p-4 rounded overflow-y-auto" style={{ maxHeight: '200px' }}>
                     {currentQuestions.map((q, index) => (
                         <div
                             key={index}

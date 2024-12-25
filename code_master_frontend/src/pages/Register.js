@@ -26,7 +26,7 @@ const SignUpForm = () => {
 
       if (response.ok) {
         alert("User Registered Successfully!");
-        console.log("Success:", result);
+        // console.log("Success:", result);
       } else {
         alert(result.message || "Registration failed!");
       }
