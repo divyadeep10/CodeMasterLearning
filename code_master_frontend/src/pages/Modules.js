@@ -70,6 +70,7 @@ const Modules = () => {
                     },
                 }
             );
+            // new module
 
             await new Promise((resolve) => setTimeout(resolve, 3000));
 
